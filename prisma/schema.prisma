@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Song {
+  id             Int      @id @default(autoincrement())
+  title          String
+  artist         String?
+  album          String?
+  lyricist       String?
+  composer       String?
+  arranger       String?
+  lyrics         String?  @db.LongText
+  translatedLyrics String? @db.LongText
+  romanizedLyrics  String? @db.LongText
+  coverUrl       String?  @db.Text
+  audioUrl       String   @db.Text
+  originalName   String   @db.Text
+  mimeType       String?
+  fileSize       Int?
+  duration       Int?
+  source         String?
+  sourceSongId   String?
+  metadataStatus String   @default("pending")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([source, sourceSongId])
+  @@index([title])
+  @@index([artist])
+}
