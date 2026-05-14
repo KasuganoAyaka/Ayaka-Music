@@ -80,6 +80,36 @@ button:disabled {
   pointer-events: none;
 }
 
+.admin-entry {
+  position: fixed;
+  z-index: 6;
+  top: 18px;
+  left: 18px;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.42);
+  text-decoration: none;
+  backdrop-filter: blur(14px);
+  transition: color 0.18s, background 0.18s, border-color 0.18s, transform 0.18s;
+}
+
+.admin-entry svg {
+  width: 22px;
+  height: 22px;
+}
+
+.admin-entry:hover {
+  border-color: rgba(255, 255, 255, 0.26);
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.72);
+  transform: translateY(-1px);
+}
+
 .loading-view {
   position: fixed;
   inset: 0;
@@ -806,7 +836,8 @@ button:disabled {
 }
 
 .upload-form,
-.online-form {
+.online-form,
+.settings-form {
   display: grid;
   grid-template-columns: minmax(180px, 1fr) minmax(180px, 1fr) minmax(260px, 1.2fr) auto;
   gap: 12px;
@@ -814,7 +845,8 @@ button:disabled {
 }
 
 .upload-form label,
-.online-form label {
+.online-form label,
+.settings-form label {
   display: grid;
   gap: 6px;
   color: var(--admin-muted);
@@ -825,6 +857,7 @@ button:disabled {
 .upload-form input,
 .online-form input,
 .online-form select,
+.settings-form input,
 .admin-login-card input {
   width: 100%;
   min-height: 44px;
@@ -840,6 +873,7 @@ button:disabled {
 .upload-form input:hover,
 .online-form input:hover,
 .online-form select:hover,
+.settings-form input:hover,
 .admin-login-card input:hover {
   border-color: rgba(255, 255, 255, 0.26);
   background: #fff;
@@ -848,6 +882,7 @@ button:disabled {
 .upload-form input:focus,
 .online-form input:focus,
 .online-form select:focus,
+.settings-form input:focus,
 .admin-login-card input:focus {
   border-color: rgba(92, 168, 255, 0.72);
   background: #fff;
@@ -857,6 +892,10 @@ button:disabled {
 .online-form {
   grid-template-columns: minmax(280px, 1fr) 150px 130px auto;
   align-items: end;
+}
+
+.settings-form {
+  grid-template-columns: minmax(180px, 1fr) minmax(180px, 1fr) auto;
 }
 
 .online-input {
@@ -1404,6 +1443,7 @@ button:disabled {
 .admin-shell a:focus-visible,
 .admin-shell input:focus-visible,
 .admin-shell select:focus-visible,
+.admin-entry:focus-visible,
 .file-zone:focus-within {
   outline: 2px solid rgba(92, 168, 255, 0.9);
   outline-offset: 2px;
@@ -1572,8 +1612,16 @@ button:disabled {
     grid-template-columns: 1fr;
   }
 
-  .online-form {
+  .online-form,
+  .settings-form {
     grid-template-columns: 1fr;
+  }
+
+  .admin-entry {
+    top: 14px;
+    left: 14px;
+    width: 40px;
+    height: 40px;
   }
 
   .file-zone {

@@ -66,6 +66,32 @@
         </form>
       </section>
 
+      <section class="admin-surface settings-panel">
+        <div class="table-head">
+          <div>
+            <h2>后台设置</h2>
+            <span>修改时需要输入当前密码。</span>
+            <small v-if="settingsNotice" class="admin-notice" :class="settingsNoticeType">{{ settingsNotice }}</small>
+          </div>
+        </div>
+        <form class="settings-form" @submit.prevent="updateAdminSettings">
+          <label>
+            当前密码
+            <input v-model="settingsForm.currentPassword" autocomplete="current-password" type="password" placeholder="保存前需要验证" />
+          </label>
+          <label>
+            新密码
+            <input v-model="settingsForm.newPassword" autocomplete="new-password" type="password" placeholder="留空则不修改" />
+          </label>
+          <div class="form-actions">
+            <button class="primary-btn" :disabled="settingsSaving">
+              <UserRound />
+              <span>{{ settingsSaving ? '保存中...' : '保存设置' }}</span>
+            </button>
+          </div>
+        </form>
+      </section>
+
       <section class="admin-surface cloud-login">
         <div class="table-head">
           <div>
@@ -313,6 +339,9 @@
     </section>
 
     <section v-else class="player-view" :style="backgroundStyle">
+      <a class="admin-entry" href="/admin" title="后台管理" aria-label="后台管理">
+        <UserRound />
+      </a>
       <div v-if="!playerReady" class="loading-view">
         <div class="loading-card">
           <div class="loading-brand">
@@ -457,6 +486,7 @@ import {
   SkipForward,
   Trash2,
   Upload,
+  UserRound,
   Volume2,
   VolumeX
 } from 'lucide-vue-next';
@@ -511,6 +541,10 @@ let neteasePollTimer = null;
 const uploadForm = ref({ title: '', artist: '', file: null });
 const onlineForm = ref({ input: '', source: 'netease', type: 'song' });
 const loginForm = ref({ username: '', password: '' });
+const settingsForm = ref({ currentPassword: '', newPassword: '' });
+const settingsSaving = ref(false);
+const settingsNotice = ref('');
+const settingsNoticeType = ref('success');
 
 const currentSong = computed(() => songs.value[currentIndex.value] || null);
 const displayTitle = computed(() => {
@@ -939,8 +973,17 @@ async function checkAdminSession() {
   const response = await fetch('/api/admin/session', { credentials: 'include' }).catch(() => null);
   adminReady.value = !!response?.ok;
   if (adminReady.value) {
-    await Promise.all([loadSongs(), refreshNeteaseStatus()]);
+    await Promise.all([loadSongs(), refreshNeteaseStatus(), loadAdminSettings()]);
   }
+}
+
+async function loadAdminSettings() {
+  const response = await fetch('/api/admin/settings', { credentials: 'include' }).catch(() => null);
+  if (!response?.ok) return;
+  settingsForm.value = {
+    currentPassword: '',
+    newPassword: ''
+  };
 }
 
 async function loginAdmin() {
@@ -956,8 +999,12 @@ async function loginAdmin() {
     });
     if (!response.ok) throw new Error((await response.json()).message || '登录失败');
     loginForm.value.password = '';
+    settingsForm.value = {
+      currentPassword: '',
+      newPassword: ''
+    };
     adminReady.value = true;
-    await loadSongs();
+    await Promise.all([loadSongs(), refreshNeteaseStatus(), loadAdminSettings()]);
   } catch (error) {
     loginError.value = error.message || '登录失败';
   } finally {
@@ -971,6 +1018,32 @@ async function logoutAdmin() {
     credentials: 'include'
   }).catch(() => null);
   adminReady.value = false;
+}
+
+async function updateAdminSettings() {
+  settingsSaving.value = true;
+  settingsNotice.value = '';
+
+  try {
+    const response = await fetch('/api/admin/settings', {
+      method: 'PUT',
+      headers: { 'content-type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(settingsForm.value)
+    });
+    if (!response.ok) throw new Error((await response.json()).message || '保存失败');
+    settingsForm.value = {
+      currentPassword: '',
+      newPassword: ''
+    };
+    settingsNoticeType.value = 'success';
+    settingsNotice.value = '管理员密码已更新';
+  } catch (error) {
+    settingsNoticeType.value = 'error';
+    settingsNotice.value = error.message || '保存失败';
+  } finally {
+    settingsSaving.value = false;
+  }
 }
 
 async function refreshNeteaseStatus() {

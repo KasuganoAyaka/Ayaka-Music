@@ -5,7 +5,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { parseFile } from 'music-metadata';
 import { prisma } from './db.js';
-import { getAdminSession, loginAdmin, logoutAdmin, requireAdmin } from './auth.js';
+import { getAdminSession, getAdminSettings, loginAdmin, logoutAdmin, requireAdmin, updateAdminSettings } from './auth.js';
 import { config, audioDir, storageDir } from './config.js';
 import { uploadAudio } from './uploads.js';
 import { enrichSongMetadata } from './metadata.js';
@@ -54,6 +54,8 @@ app.get('/api/health', (_req, res) => {
 app.post('/api/admin/login', loginAdmin);
 app.post('/api/admin/logout', logoutAdmin);
 app.get('/api/admin/session', getAdminSession);
+app.get('/api/admin/settings', requireAdmin, getAdminSettings);
+app.put('/api/admin/settings', requireAdmin, updateAdminSettings);
 
 app.get('/api/admin/netease/status', requireAdmin, async (_req, res, next) => {
   try {

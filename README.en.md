@@ -34,7 +34,7 @@ This project does not ship third-party music assets. Online resolving, lyrics, c
 - Player UI with cover art, lyrics, playlist, progress bar, volume control, and playback mode switcher.
 - Playback modes: list loop, stop after list ends, single repeat, and shuffle.
 - Lyrics: timed scrolling, click-to-seek, foreign-language Chinese translation, and Japanese romanization display.
-- Admin login with username/password from `.env`.
+- Admin login with fixed username `admin`; the password is stored in MySQL as a salted hash.
 - Local audio upload with embedded tag reading and metadata lookup.
 - Online resolving for WangYY and QQ Music songs, playlists, albums, and artists.
 - WangYY QR login in the admin panel for playlist access and restricted playable URLs.
@@ -114,8 +114,6 @@ URLs:
 DATABASE_URL="mysql://root:password@localhost:3306/ayaka_music"
 PORT=3000
 WEB_ORIGIN="http://localhost:5173"
-ADMIN_USERNAME="admin"
-ADMIN_PASSWORD="admin123"
 SESSION_SECRET="change-this-session-secret"
 NETEASE_COOKIE=""
 PUBLIC_BASE_URL="http://localhost:3000"
@@ -124,14 +122,13 @@ PUBLIC_BASE_URL="http://localhost:3000"
 Notes:
 
 - `DATABASE_URL`: MySQL connection string.
-- `ADMIN_USERNAME` / `ADMIN_PASSWORD`: admin credentials.
 - `SESSION_SECRET`: cookie signing secret. Change it in production.
 - `NETEASE_COOKIE`: optional. The admin QR login flow is recommended.
 - `PUBLIC_BASE_URL`: public backend URL used to generate local upload URLs.
 
 ## Admin Workflow
 
-Open `/admin` and log in with the credentials from `.env`.
+Open `/admin` and log in with username `admin`. On first startup, the database admin password defaults to `admin123`; change it in the admin settings after logging in.
 
 Typical flow:
 
