@@ -524,6 +524,7 @@ const songListNoticeType = ref('success');
 const metadataRefreshing = ref(false);
 const metadataRefreshDone = ref(0);
 const metadataRefreshTotal = ref(0);
+const minLoadingMs = 1800;
 const pageSize = 30;
 const neteaseLoading = ref(false);
 const neteaseStatus = ref({ loggedIn: false, profile: null });
@@ -745,9 +746,13 @@ async function loadSongs() {
   } catch {
     songs.value = [];
     return false;
-  } finally {
-    if (!isAdmin.value) playerReady.value = true;
   }
+}
+
+async function bootstrapPlayer() {
+  playerReady.value = false;
+  await Promise.all([loadSongs(), sleep(minLoadingMs)]);
+  playerReady.value = true;
 }
 
 async function refreshAdminSongs() {
@@ -1344,7 +1349,7 @@ onMounted(() => {
   if (isAdmin.value) {
     checkAdminSession();
   } else {
-    loadSongs();
+    bootstrapPlayer();
   }
   bindMediaSession();
   window.addEventListener('keydown', onKeydown);
