@@ -31,8 +31,14 @@
           <span>上传音频后自动搜索歌词、歌手、封面</span>
         </div>
         <div class="admin-header-actions">
-          <button class="text-btn" @click="logoutAdmin">退出登录</button>
-          <a class="back-link" href="/">返回前台</a>
+          <a class="back-link" href="/">
+            <Home />
+            <span>返回前台</span>
+          </a>
+          <button class="text-btn danger-soft" @click="logoutAdmin">
+            <LogOut />
+            <span>退出登录</span>
+          </button>
         </div>
       </header>
 
@@ -51,9 +57,12 @@
             <span>{{ uploadForm.file?.name || '选择音频文件' }}</span>
             <input type="file" accept="audio/*" @change="onFileChange" />
           </label>
-          <button class="primary-btn" :disabled="uploading">
-            {{ uploading ? '上传与匹配中...' : '上传歌曲' }}
-          </button>
+          <div class="form-actions">
+            <button class="primary-btn" :disabled="uploading">
+              <Upload />
+              <span>{{ uploading ? '上传与匹配中...' : '上传歌曲' }}</span>
+            </button>
+          </div>
         </form>
       </section>
 
@@ -64,8 +73,14 @@
             <span>{{ neteaseStatusText }}</span>
           </div>
           <div class="result-actions">
-            <button class="text-btn" @click="refreshNeteaseStatus">刷新状态</button>
-            <button v-if="neteaseStatus.loggedIn" class="text-btn" @click="logoutNetease">退出网易云</button>
+            <button class="text-btn compact" @click="refreshNeteaseStatus">
+              <RefreshCw />
+              <span>刷新状态</span>
+            </button>
+            <button v-if="neteaseStatus.loggedIn" class="text-btn danger-soft compact" @click="logoutNetease">
+              <LogOut />
+              <span>退出网易云</span>
+            </button>
           </div>
         </div>
 
@@ -81,7 +96,8 @@
 
           <div v-else class="netease-qr-box">
             <button v-if="!neteaseQr.qrImage" class="primary-btn" :disabled="neteaseLoading" @click="createNeteaseQr">
-              {{ neteaseLoading ? '生成中...' : '扫码登录网易云' }}
+              <QrCode />
+              <span>{{ neteaseLoading ? '生成中...' : '扫码登录网易云' }}</span>
             </button>
             <template v-else>
               <img class="netease-qr" :src="neteaseQr.qrImage" alt="网易云登录二维码" />
@@ -100,8 +116,9 @@
             <h2>我的网易云歌单</h2>
             <span>选择歌单后勾选歌曲导入到播放器。</span>
           </div>
-            <button class="text-btn" type="button" :disabled="neteasePlaylistsLoading" @click="loadNeteasePlaylists">
-            {{ neteasePlaylistsLoading ? '加载中...' : '刷新歌单' }}
+          <button class="text-btn compact" type="button" :disabled="neteasePlaylistsLoading" @click="loadNeteasePlaylists">
+            <RefreshCw :class="{ spinning: neteasePlaylistsLoading }" />
+            <span>{{ neteasePlaylistsLoading ? '加载中...' : '刷新歌单' }}</span>
           </button>
         </div>
 
@@ -130,10 +147,12 @@
             <span>{{ selectedNeteasePlaylist.name }} · 第 {{ neteasePage }} / {{ neteaseTotalPages }} 页 · 已选 {{ selectedNeteaseSongIds.length }} / {{ neteasePlaylistSongs.length }} 首</span>
             <div class="result-actions">
               <button class="text-btn" type="button" @click="toggleAllNeteaseSongs">
-                {{ isCurrentNeteasePageAllSelected ? '取消本页' : '全选本页' }}
+                <ListChecks />
+                <span>{{ isCurrentNeteasePageAllSelected ? '取消本页' : '全选本页' }}</span>
               </button>
-              <button class="text-btn accent" type="button" :disabled="neteaseImporting || !selectedNeteaseSongIds.length" @click="importSelectedNeteaseSongs">
-                {{ neteaseImporting ? '导入中...' : '导入选中' }}
+              <button class="primary-btn small" type="button" :disabled="neteaseImporting || !selectedNeteaseSongIds.length" @click="importSelectedNeteaseSongs">
+                <Download />
+                <span>{{ neteaseImporting ? '导入中...' : '导入选中' }}</span>
               </button>
             </div>
           </div>
@@ -153,9 +172,15 @@
             </article>
           </div>
           <div class="pager">
-            <button class="text-btn" type="button" :disabled="neteasePage <= 1" @click="neteasePage -= 1">上一页</button>
+            <button class="text-btn page-btn" type="button" :disabled="neteasePage <= 1" @click="neteasePage -= 1">
+              <ChevronLeft />
+              <span>上一页</span>
+            </button>
             <span>{{ neteasePage }} / {{ neteaseTotalPages }}</span>
-            <button class="text-btn" type="button" :disabled="neteasePage >= neteaseTotalPages" @click="neteasePage += 1">下一页</button>
+            <button class="text-btn page-btn" type="button" :disabled="neteasePage >= neteaseTotalPages" @click="neteasePage += 1">
+              <span>下一页</span>
+              <ChevronRight />
+            </button>
           </div>
         </div>
       </section>
@@ -189,9 +214,12 @@
               <option value="artist">歌手</option>
             </select>
           </label>
-          <button class="primary-btn" :disabled="onlineLoading">
-            {{ onlineLoading ? '解析中...' : '解析预览' }}
-          </button>
+          <div class="form-actions">
+            <button class="primary-btn" :disabled="onlineLoading">
+              <ListChecks />
+              <span>{{ onlineLoading ? '解析中...' : '解析预览' }}</span>
+            </button>
+          </div>
         </form>
 
         <div v-if="onlineError" class="form-error">{{ onlineError }}</div>
@@ -201,10 +229,12 @@
             <span>{{ onlineResult.providerLabel }} · {{ onlineResult.typeLabel }} · 第 {{ onlinePage }} / {{ onlineTotalPages }} 页 · 已选 {{ selectedOnlineIds.length }} / {{ onlineResult.songs.length }} 首</span>
             <div class="result-actions">
               <button class="text-btn" type="button" @click="toggleAllOnline">
-                {{ isCurrentOnlinePageAllSelected ? '取消本页' : '全选本页' }}
+                <ListChecks />
+                <span>{{ isCurrentOnlinePageAllSelected ? '取消本页' : '全选本页' }}</span>
               </button>
-              <button class="text-btn accent" type="button" :disabled="onlineImporting || !selectedOnlineIds.length" @click="importOnline">
-                {{ onlineImporting ? '导入中...' : '导入选中' }}
+              <button class="primary-btn small" type="button" :disabled="onlineImporting || !selectedOnlineIds.length" @click="importOnline">
+                <Download />
+                <span>{{ onlineImporting ? '导入中...' : '导入选中' }}</span>
               </button>
             </div>
           </div>
@@ -224,9 +254,15 @@
             </article>
           </div>
           <div class="pager">
-            <button class="text-btn" type="button" :disabled="onlinePage <= 1" @click="onlinePage -= 1">上一页</button>
+            <button class="text-btn page-btn" type="button" :disabled="onlinePage <= 1" @click="onlinePage -= 1">
+              <ChevronLeft />
+              <span>上一页</span>
+            </button>
             <span>{{ onlinePage }} / {{ onlineTotalPages }}</span>
-            <button class="text-btn" type="button" :disabled="onlinePage >= onlineTotalPages" @click="onlinePage += 1">下一页</button>
+            <button class="text-btn page-btn" type="button" :disabled="onlinePage >= onlineTotalPages" @click="onlinePage += 1">
+              <span>下一页</span>
+              <ChevronRight />
+            </button>
           </div>
         </div>
       </section>
@@ -401,11 +437,18 @@
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import {
+  ChevronLeft,
+  ChevronRight,
+  Download,
+  Home,
   Languages,
   ListEnd,
+  ListChecks,
+  LogOut,
   Music,
   Pause,
   Play,
+  QrCode,
   RefreshCw,
   Repeat,
   Repeat1,
